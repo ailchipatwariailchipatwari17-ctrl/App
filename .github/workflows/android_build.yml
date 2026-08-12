@@ -1,0 +1,43 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Unzip Project Code
+      run: |
+        unzip -o docuscan-ai.zip -d .
+        # अगर Unzip होने के बाद कोड किसी फ़ोल्डर के अंदर चला जाए, तो उसे बाहर लाएं
+        if [ ! -f "gradlew" ]; then
+          FOUND=$(find . -maxdepth 2 -name "gradlew" -exec dirname {} \;)
+          if [ -n "$FOUND" ]; then
+            cp -r $FOUND/* . || true
+          fi
+        fi
+
+    - name: Grant Execute Permission for Gradlew
+      run: chmod +x gradlew || true
+
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug
+
+    - name: Upload Debug APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug
+        path: "**/build/outputs/apk/debug/*.apk"
+        
