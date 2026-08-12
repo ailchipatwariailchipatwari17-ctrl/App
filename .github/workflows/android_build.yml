@@ -21,16 +21,19 @@ jobs:
     - name: Unzip Project Code
       run: |
         unzip -o docuscan-ai.zip -d .
-        # अगर Unzip होने के बाद कोड किसी फ़ोल्डर के अंदर चला जाए, तो उसे बाहर लाएं
-        if [ ! -f "gradlew" ]; then
-          FOUND=$(find . -maxdepth 2 -name "gradlew" -exec dirname {} \;)
+        if [ ! -f "build.gradle" ] && [ ! -f "build.gradle.kts" ]; then
+          FOUND=$(find . -maxdepth 2 -name "build.gradle*" -exec dirname {} \;)
           if [ -n "$FOUND" ]; then
             cp -r $FOUND/* . || true
           fi
         fi
 
+    - name: Setup Fresh Gradle Wrapper
+      run: |
+        gradle wrapper --gradle-version 8.2
+
     - name: Grant Execute Permission for Gradlew
-      run: chmod +x gradlew || true
+      run: chmod +x gradlew
 
     - name: Build Debug APK
       run: ./gradlew assembleDebug
