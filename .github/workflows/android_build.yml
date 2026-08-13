@@ -28,15 +28,20 @@ jobs:
           fi
         fi
 
-    - name: Setup Compatible Gradle Wrapper
+    - name: Clean Gradle Caches
       run: |
-        gradle wrapper --gradle-version 8.2
+        rm -rf ~/.gradle/caches/
+        rm -rf ~/.gradle/daemon/
+
+    - name: Setup Fresh Gradle Wrapper
+      run: |
+        gradle wrapper --gradle-version 8.4
 
     - name: Grant Execute Permission for Gradlew
       run: chmod +x gradlew
 
     - name: Build Debug APK
-      run: ./gradlew assembleDebug --no-daemon -Pandroid.suppressUnsupportedCompileSdk=34
+      run: ./gradlew assembleDebug --no-daemon --no-build-cache --no-configuration-cache
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
