@@ -1,46 +1,19 @@
-name: Build Android APK
-
-on:
-  push:
-    branches: [ "main" ]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
-
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-
-    - name: Unzip Project Code
-      run: |
-        unzip -o docuscan-ai.zip -d .
-        if [ ! -f "build.gradle" ] && [ ! -f "build.gradle.kts" ]; then
-          FOUND=$(find . -maxdepth 2 -name "build.gradle*" -exec dirname {} \;)
-          if [ -n "$FOUND" ]; then
-            cp -r $FOUND/* . || true
-          fi
-        fi
-
-    - name: Setup Fresh Gradle Wrapper
-      run: |
-        gradle wrapper --gradle-version 8.2
-
-    - name: Grant Execute Permission for Gradlew
-      run: chmod +x gradlew
-
-    - name: Build Debug APK
-      run: ./gradlew assembleDebug --no-daemon --no-configuration-cache --stacktrace
-
-    - name: Upload Debug APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-debug
-        path: "**/build/outputs/apk/debug/*.apk"
-        
+/ (Project Root)
+├── build.gradle.kts                # Root Build Configuration
+├── settings.gradle.kts             # Settings & Module Declarations
+├── gradle.properties               # JVM Memory & AndroidX Properties
+├── gradlew                         # Gradle Wrapper Execution Script
+├── gradle/
+│   ├── libs.versions.toml          # Dependency Version Catalog
+│   └── wrapper/
+│       └── gradle-wrapper.properties # Gradle Wrapper Config (Gradle 8.11.1)
+├── .github/
+│   └── workflows/
+│       └── android_build.yml       # Automated GitHub Actions APK Build Workflow
+└── app/
+    ├── build.gradle.kts            # App Module Build Script (minSdk = 23)
+    └── src/
+        └── main/
+            ├── AndroidManifest.xml # Permissions & Application Config
+            ├── res/                # XML Resources, Strings & App Icons
+            └── java/com/example/   # Complete Kotlin & Jetpack Compose Source Code
