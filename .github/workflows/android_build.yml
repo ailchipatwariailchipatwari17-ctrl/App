@@ -12,10 +12,10 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Set up JDK 21
+    - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
-        java-version: '21'
+        java-version: '17'
         distribution: 'temurin'
 
     - name: Unzip Project Code
@@ -28,15 +28,15 @@ jobs:
           fi
         fi
 
-    - name: Setup Fresh Gradle Wrapper
+    - name: Setup Compatible Gradle Wrapper
       run: |
-        gradle wrapper --gradle-version 8.5
+        gradle wrapper --gradle-version 8.2
 
     - name: Grant Execute Permission for Gradlew
       run: chmod +x gradlew
 
     - name: Build Debug APK
-      run: ./gradlew assembleDebug --no-daemon --no-configuration-cache --stacktrace
+      run: ./gradlew assembleDebug --no-daemon -Pandroid.suppressUnsupportedCompileSdk=34
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
